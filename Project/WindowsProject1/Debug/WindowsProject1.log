@@ -1,3 +1,2 @@
 ﻿  WindowsProject1.cpp
-c:\users\user2\source\repos\windowsproject1\windowsproject1\windowsproject1.cpp(34): warning C4244: '인수': 'time_t'에서 'unsigned int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
   WindowsProject1.vcxproj -> C:\Users\user2\source\repos\WindowsProject1\Debug\WindowsProject1.exe
