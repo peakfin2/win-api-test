@@ -222,7 +222,7 @@ HRESULT InitDevice()
 	dexcDepth.CPUAccessFlags = 0;
 	dexcDepth.MiscFlags = 0;
 
-	hr = g_pd3dDevice->CreateTexture2D(&dexcDepth, NULL, &g_DepthStencil);
+	
 
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
 	ZeroMemory(&descDSV, sizeof(descDSV));
@@ -240,6 +240,8 @@ HRESULT InitDevice()
     }
     if( FAILED( hr ) )
         return hr;
+
+	hr = g_pd3dDevice->CreateTexture2D(&dexcDepth, NULL, &g_DepthStencil);
 
     // Create a render target view
     ID3D11Texture2D* pBackBuffer = NULL;
@@ -364,6 +366,8 @@ void CleanupDevice()
     if( g_pSwapChain ) g_pSwapChain->Release();
     if( g_pImmediateContext ) g_pImmediateContext->Release();
     if( g_pd3dDevice ) g_pd3dDevice->Release();
+	if (g_DepthStencil) g_DepthStencil->Release();
+	if (g_pDepthStencilView) g_pDepthStencilView->Release();
 }
 
 
@@ -402,6 +406,7 @@ void Render()
     // Clear the back buffer 
     float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; // red,green,blue,alpha
     g_pImmediateContext->ClearRenderTargetView( g_pRenderTargetView, ClearColor );
+	g_pImmediateContext->ClearDepthStencilView(g_pDepthStencilView, D3D11_CLEAR_DEPTH, 1.f, 0);
 
     // Render a triangle
 	g_pImmediateContext->VSSetShader( g_pVertexShader, NULL, 0 );
