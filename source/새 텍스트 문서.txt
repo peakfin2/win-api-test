@@ -39,6 +39,7 @@ ID3D11PixelShader*      g_pPixelShader = NULL;
 ID3D11InputLayout*      g_pVertexLayout = NULL;
 ID3D11Buffer*           g_pVertexBuffer = NULL;
 ID3D11Texture2D*		g_DepthStencil = NULL;
+ID3D11ShaderResourceView* g_pTextrueRV = NULL;
 
 
 //--------------------------------------------------------------------------------------
@@ -158,6 +159,17 @@ HRESULT CompileShaderFromFile( WCHAR* szFileName, LPCSTR szEntryPoint, LPCSTR sz
     if( pErrorBlob ) pErrorBlob->Release();
 
     return S_OK;
+}
+
+SimpleVertex RotateV2(float x, float y, float angle) {
+	float retX = sqrt(x*x + y*y) * cos(atan2(x, y) + angle * 3.1416 / 180);
+	float retY = sqrt(x*x + y*y) * sin(atan2(x, y) + angle * 3.1416 / 180);
+
+	SimpleVertex ret;
+	ret.Pos.x = retX;
+	ret.Pos.y = retY;
+	ret.Pos.z = .5f;
+	return ret;
 }
 
 
@@ -319,18 +331,67 @@ HRESULT InitDevice()
     if( FAILED( hr ) )
         return hr;
 
-    // Create vertex buffer
+	D3DX11CreateShaderResourceViewFromFile(g_pd3dDevice, 
+											L"specular.png", 
+											NULL, NULL, 
+											&g_pTextrueRV, &hr);
+
+	ID3D11Resource* pResource = NULL;
+	g_pTextrueRV->GetResource(&pResource);
+
+	D3D11_RESOURCE_DIMENSION resourceType;
+	pResource->GetType(&resourceType);
+
+	switch (resourceType)
+	{
+	case D3D11_RESOURCE_DIMENSION_TEXTURE1D:
+	{
+		ID3D11Texture1D* pTextureID = (ID3D11Texture1D*)pResource;
+	}
+		break;
+	case D3D11_RESOURCE_DIMENSION_TEXTURE2D:
+	{
+		ID3D11Texture2D * pTextureID = (ID3D11Texture2D*)pResource;
+		D3D11_TEXTURE2D_DESC desc;
+		pTextureID->GetDesc(&desc);
+
+		
+	}
+		break;
+	case D3D11_RESOURCE_DIMENSION_TEXTURE3D:
+	{
+		ID3D11Texture3D * pTextureID = (ID3D11Texture3D*)pResource;
+	}
+		break;
+	default:
+		break;
+	}
+
+
+     //Create vertex buffer
     SimpleVertex vertices[] =
     {
-        XMFLOAT3( 0.0f, 0.5f, 0.5f ),
+		XMFLOAT3(0.0f, 0.8f, 0.5f),
         XMFLOAT3( 0.5f, -0.5f, 0.5f ),
         XMFLOAT3( -0.5f, -0.5f, 0.5f ),
+		XMFLOAT3(-0.5f, 0.5f, 0.5f),
+		XMFLOAT3(0.5f, 0.5f, 0.5f),
+		XMFLOAT3(0.0f, -0.8f, 0.5f),
     };
-
+	/*SimpleVertex vertices[] =
+	{
+		RotateV2(0.0f, 0.8f, 30.f),
+		RotateV2(0.5f, -0.5f, 30.f),
+		RotateV2(-0.5f, -0.5f, 30.f),
+		RotateV2(-0.5f, 0.5f, 30.f),
+		RotateV2(0.5f, 0.5f, 30.f),
+		RotateV2(0.0f, -0.8f, 30.f),
+	};*/
+	
     D3D11_BUFFER_DESC bd;
 	ZeroMemory( &bd, sizeof(bd) );
     bd.Usage = D3D11_USAGE_DEFAULT;
-    bd.ByteWidth = sizeof( SimpleVertex ) * 3;
+    bd.ByteWidth = sizeof( SimpleVertex ) * 6;
     bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd.CPUAccessFlags = 0;
     D3D11_SUBRESOURCE_DATA InitData;
@@ -346,7 +407,7 @@ HRESULT InitDevice()
     g_pImmediateContext->IASetVertexBuffers( 0, 1, &g_pVertexBuffer, &stride, &offset );
 
     // Set primitive topology
-    g_pImmediateContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+    g_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     return S_OK;
 }
@@ -382,10 +443,18 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 
     switch( message )
     {
+		case WM_CREATE:
+		{
+			HANDLE timer = (HANDLE)SetTimer(hWnd, 0, 10, NULL);
+		}
+			break;
         case WM_PAINT:
             hdc = BeginPaint( hWnd, &ps );
             EndPaint( hWnd, &ps );
             break;
+		case WM_TIMER:
+
+			break;
 
         case WM_DESTROY:
             PostQuitMessage( 0 );
@@ -412,7 +481,7 @@ void Render()
     // Render a triangle
 	g_pImmediateContext->VSSetShader( g_pVertexShader, NULL, 0 );
 	g_pImmediateContext->PSSetShader( g_pPixelShader, NULL, 0 );
-    g_pImmediateContext->Draw( 3, 0 );
+    g_pImmediateContext->Draw( 6, 0 );
 
     // Present the information rendered to the back buffer to the front buffer (the screen)
     g_pSwapChain->Present( 0, 0 );
