@@ -40,7 +40,7 @@ ID3D11InputLayout*      g_pVertexLayout = NULL;
 ID3D11Buffer*           g_pVertexBuffer = NULL;
 ID3D11Texture2D*		g_DepthStencil = NULL;
 ID3D11ShaderResourceView* g_pTextrueRV = NULL;
-
+ID3D11Texture2D*		g_pRenderTarget = NULL;
 
 //--------------------------------------------------------------------------------------
 // Forward declarations
@@ -331,41 +331,64 @@ HRESULT InitDevice()
     if( FAILED( hr ) )
         return hr;
 
-	D3DX11CreateShaderResourceViewFromFile(g_pd3dDevice, 
-											L"specular.png", 
-											NULL, NULL, 
-											&g_pTextrueRV, &hr);
+	//D3DX11CreateShaderResourceViewFromFile(g_pd3dDevice, 
+	//										L"specular.png", 
+	//										NULL, NULL, 
+	//										&g_pTextrueRV, &hr);
 
-	ID3D11Resource* pResource = NULL;
-	g_pTextrueRV->GetResource(&pResource);
+	//ID3D11Resource* pResource = NULL;
+	//g_pTextrueRV->GetResource(&pResource);
 
-	D3D11_RESOURCE_DIMENSION resourceType;
-	pResource->GetType(&resourceType);
+	//D3D11_RESOURCE_DIMENSION resourceType;
+	//pResource->GetType(&resourceType);
 
-	switch (resourceType)
-	{
-	case D3D11_RESOURCE_DIMENSION_TEXTURE1D:
-	{
-		ID3D11Texture1D* pTextureID = (ID3D11Texture1D*)pResource;
-	}
-		break;
-	case D3D11_RESOURCE_DIMENSION_TEXTURE2D:
-	{
-		ID3D11Texture2D * pTextureID = (ID3D11Texture2D*)pResource;
-		D3D11_TEXTURE2D_DESC desc;
-		pTextureID->GetDesc(&desc);
+	//switch (resourceType)
+	//{
+	//case D3D11_RESOURCE_DIMENSION_TEXTURE1D:
+	//{
+	//	ID3D11Texture1D* pTextureID = (ID3D11Texture1D*)pResource;
+	//}
+	//	break;
+	//case D3D11_RESOURCE_DIMENSION_TEXTURE2D:
+	//{
+	//	ID3D11Texture2D * pTextureID = (ID3D11Texture2D*)pResource;
+	//	D3D11_TEXTURE2D_DESC desc;
+	//	pTextureID->GetDesc(&desc);
+	//	/*desc.Usage = D3D11_USAGE_DYNAMIC;
+	//	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	//	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;*/
+	//	g_pd3dDevice->CreateTexture2D(&desc, NULL, &g_pRenderTarget);
 
-		
-	}
-		break;
-	case D3D11_RESOURCE_DIMENSION_TEXTURE3D:
-	{
-		ID3D11Texture3D * pTextureID = (ID3D11Texture3D*)pResource;
-	}
-		break;
-	default:
-		break;
-	}
+	//	D3D11_MAPPED_SUBRESOURCE mr;
+	//	hr = g_pImmediateContext->Map(g_pRenderTarget, D3D11CalcSubresource(0, 0, 1),
+	//		D3D11_MAP_WRITE_DISCARD, 0, &mr);
+	//	UCHAR* pTexels = (UCHAR*)mr.pData;
+	//	
+	//	for (UINT row = 0; row < desc.Height; row++) 
+	//	{
+	//		UINT rowStart = row * mr.RowPitch;
+	//		for (UINT col = 0; col < desc.Width; col++)
+	//		{
+	//			UINT colStart = col * 4;
+	//			pTexels[rowStart + colStart + 0] = 255;
+	//			pTexels[rowStart + colStart + 1] = 128;
+	//			pTexels[rowStart + colStart + 2] = 64;
+	//			pTexels[rowStart + colStart + 3] = 32;
+	//		}
+	//	}
+
+	//}
+	//	break;
+	//case D3D11_RESOURCE_DIMENSION_TEXTURE3D:
+	//{
+	//	ID3D11Texture3D * pTextureID = (ID3D11Texture3D*)pResource;
+	//}
+	//	break;
+	//default:
+	//	break;
+	//}
+
+	
 
 
      //Create vertex buffer
